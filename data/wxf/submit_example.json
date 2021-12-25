@@ -1,0 +1,24 @@
+{
+    "annotations": [
+        {
+            "filename": "test_images\\00008.jpg",
+            "period": "Morning",
+            "weather": "Cloudy"
+        },
+        {
+            "filename": "test_images\\00018.jpg",
+            "period": "Morning",
+            "weather": "Cloudy"
+        },
+        {
+            "filename": "test_images\\00020.jpg",
+            "period": "Morning",
+            "weather": "Cloudy"
+        },
+        {
+            "filename": "test_images\\00022.jpg",
+            "period": "Morning",
+            "weather": "Cloudy"
+        }
+	]
+}

@@ -19,14 +19,14 @@ from .utils import custom_replace, weights_init
 
 
 class CTranModel(nn.Module):
-    def __init__(self, num_labels, use_lmt, pos_emb=False, layers=3, heads=4, dropout=0.1, no_x_features=False, downsample=False):
+    def __init__(self, num_labels, use_lmt, pos_emb=False, backbone='resnet101', layers=3, heads=4, dropout=0.1, no_x_features=False, downsample=False):
         super(CTranModel, self).__init__()
         self.use_lmt = use_lmt
 
         self.no_x_features = no_x_features  # (for no image features)
 
         # ResNet101 backbone
-        self.backbone = Backbone()
+        self.backbone = Backbone(model_name=backbone)
         hidden = 2048  # this should match the backbone output feature size
 
         self.downsample = downsample

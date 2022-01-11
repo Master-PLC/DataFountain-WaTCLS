@@ -12,6 +12,7 @@ import os
 
 import numpy as np
 import torch
+import torch.nn.functional as F
 import ujson
 from PIL import Image
 from torch.serialization import save
@@ -101,8 +102,9 @@ class WxfDataset(Dataset):
 
         optimal_threshold = 0.5
 
+        predictions = F.sigmoid(predictions)
         predictions = predictions.numpy()
-        top_2nd = np.sort(predictions)[:, -2:]
+        top_2nd = np.sort(predictions)[:, -2:].tolist()
         # predictions_top2 = predictions.copy()
         # predictions_top2[predictions_top2 < top_2nd] = 0
         # predictions_top2[predictions_top2 >= top_2nd] = 1
@@ -119,7 +121,7 @@ class WxfDataset(Dataset):
             cate_confidence = top_2nd[i]
             for j, cate in enumerate(cate_idx):
                 class_dict = dict()
-                if j < 4:
+                if cate < 4:
                     class_dict["period"] = idx_category[cate]
                 else:
                     class_dict["weather"] = idx_category[cate]

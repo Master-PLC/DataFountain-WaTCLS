@@ -10,30 +10,35 @@
 
 import os
 import shutil
+from random import seed
+
+from utils.random_seed import seed_init
 
 
 def get_args(parser, eval=False):
     parser.add_argument('--dataroot', type=str, default='./data/')
     parser.add_argument('--dataset', type=str, choices=[
-                        'coco', 'voc', 'coco1000', 'nus', 'vg', 'news', 'cub'], default='wxf')
+                        'coco', 'voc', 'coco1000', 'nus', 'vg', 'news', 'cub', 'wxf'], default='wxf')
     parser.add_argument('--train_ratio', type=float,
                         default=0.8, help='ratio of train dataset.')
     parser.add_argument('--workers', type=int, default=10)
     parser.add_argument('--results_dir', type=str, default='results/')
     parser.add_argument('--test_known', type=int, default=0)
+    parser.add_argument('--seed', type=int, default=89112)
+    parser.add_argument('--gpu_id', type=str, default='2,4')
 
     # Optimization
     parser.add_argument('--optim', type=str,
                         choices=['adam', 'sgd'], default='adam')
     parser.add_argument('--lr', type=float, default=0.0002,
                         help="learning rate of optimizer")
-    parser.add_argument('--batch_size', type=int, default=2)
+    parser.add_argument('--batch_size', type=int, default=32)
     parser.add_argument('--test_batch_size', type=int, default=-1)
     parser.add_argument('--grad_ac_steps', type=int,
                         default=1, help="gradient accumulation steps, grad_ac_steps supply batch_size equals to real batch_size")
-    parser.add_argument('--scheduler_step', type=int, default=1000)
+    parser.add_argument('--scheduler_step', type=int, default=200)
     parser.add_argument('--scheduler_gamma', type=float, default=0.1)
-    parser.add_argument('--epochs', type=int, default=100)
+    parser.add_argument('--epochs', type=int, default=30)
     parser.add_argument('--int_loss', type=float, default=0.0)
     parser.add_argument('--aux_loss', type=float, default=0.0)
     parser.add_argument('--loss_type', type=str,
@@ -48,10 +53,14 @@ def get_args(parser, eval=False):
     parser.add_argument('--max_batches', type=int, default=-1)
     parser.add_argument('--warmup_scheduler',
                         action='store_true', help='use warmup scheduler or step scheduler')
+    parser.add_argument('--clip', type=float, default=10,
+                        help='clip the gradient')
 
     # Model
-    parser.add_argument('--layers', type=int, default=3)
-    parser.add_argument('--heads', type=int, default=4)
+    parser.add_argument('--backbone', type=str, default="resnet50",
+                        help='backbone to extract features.')
+    parser.add_argument('--layers', type=int, default=2)
+    parser.add_argument('--heads', type=int, default=8)
     parser.add_argument('--dropout', type=float, default=0.1)
     parser.add_argument('--pos_emb', action='store_true',
                         help='positional encoding')
@@ -73,7 +82,8 @@ def get_args(parser, eval=False):
     parser.add_argument('--inference', action='store_true')
     parser.add_argument('--predict', action='store_true')
     parser.add_argument('--resume', action='store_true')
-    parser.add_argument('--saved_model_name', type=str, default='')
+    parser.add_argument('--saved_model_name', type=str,
+                        default='results/wxf.2layer.8head.bsz_32.adam0.0002.clip10.resnet50.ep30/best_model.pt')
 
     parser.add_argument('--overwrite', action='store_true')
     parser.add_argument('--name', type=str, default='')
@@ -101,8 +111,12 @@ def get_args(parser, eval=False):
         exit()
 
     model_name += '.'+str(args.layers)+'layer'
+    model_name += '.'+str(args.heads)+'head'
     model_name += '.bsz_{}'.format(int(args.batch_size * args.grad_ac_steps))
     model_name += '.'+args.optim+str(args.lr)  # .split('.')[1]
+    model_name += '.'+'clip'+str(args.clip)  # .split('.')[1]
+    model_name += '.'+args.backbone
+    model_name += '.'+'ep'+str(args.epochs)
 
     if args.use_lmt:
         model_name += '.lmt'
@@ -164,5 +178,8 @@ def get_args(parser, eval=False):
             exit(0)
     elif not os.path.exists(args.model_name):
         os.makedirs(args.model_name)
+
+    seed_init(args.seed)
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_id
 
     return args

@@ -183,6 +183,7 @@ def get_data(args):
         data_size = len(os.listdir(train_img_dir))
         train_size = int(data_size * args.train_ratio)
         train_indices = np.random.choice(data_size, train_size, replace=False)
+        train_indices.sort()
         valid_indices = np.delete(np.arange(data_size), train_indices)
 
         train_anno_path = os.path.join(wxf_root, 'train_dataset/train.json')

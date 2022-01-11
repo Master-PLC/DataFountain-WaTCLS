@@ -34,8 +34,8 @@ def run_epoch(args, model, data, optimizer, epoch, desc, train=False, warmup_sch
     loss_total = 0
     unk_loss_total = 0
 
-    # mininterval: 最小更新时间（s）；desc： 进度条的前缀
-    # leave：进度显示在一行（False）；ncols： 进度条总长度
+    # mininterval: 最小更新时间（s）；desc�?进度条的前缀
+    # leave：进度显示在一行（False）；ncols�?进度条总长�?
     for batch in tqdm(data, mininterval=0.5, desc=desc, leave=False, ncols=50):
         if batch_idx == max_samples:
             break
@@ -46,7 +46,7 @@ def run_epoch(args, model, data, optimizer, epoch, desc, train=False, warmup_sch
         images = batch['image'].float()
         # Shape: [batch_size, num_labels] = [32, 20]
         mask = batch['mask'].float()
-        # 将三种状态的mask换成新值
+        # 将三种状态的mask换成新�?
         unk_mask = custom_replace(mask, 1, 0, 0)
         mask_in = mask.clone()
 
@@ -86,7 +86,7 @@ def run_epoch(args, model, data, optimizer, epoch, desc, train=False, warmup_sch
 
             if args.loss_labels == 'unk':
                 # only use unknown labels for loss
-                loss_out = (unk_mask.cuda()*loss).sum()
+                loss_out = (unk_mask.cuda() * loss).sum()
             else:
                 # use all labels for loss
                 loss_out = loss.sum()
@@ -96,6 +96,7 @@ def run_epoch(args, model, data, optimizer, epoch, desc, train=False, warmup_sch
             loss_out.backward()
             # Grad Accumulation
             if ((batch_idx + 1) % args.grad_ac_steps == 0):
+                # torch.nn.utils.clip_grad_norm(model.parameters(), args.clip)
                 optimizer.step()
                 optimizer.zero_grad()
                 if warmup_scheduler is not None:

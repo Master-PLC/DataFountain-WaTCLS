@@ -35,7 +35,7 @@ if __name__ == "__main__":
         model = CTranModelCub(args.num_labels, args.use_lmt, args.pos_emb,
                               args.layers, args.heads, args.dropout, args.no_x_features)
     else:
-        model = CTranModel(args.num_labels, args.use_lmt, args.pos_emb,
+        model = CTranModel(args.num_labels, args.use_lmt, args.pos_emb, args.backbone,
                            args.layers, args.heads, args.dropout, args.no_x_features)
     print("---> the self-attention layer of C-Transformer model: ")
     print(model.self_attn_layers)

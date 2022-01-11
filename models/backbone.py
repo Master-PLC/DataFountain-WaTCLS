@@ -19,13 +19,18 @@ from torch.nn import Parameter
 
 
 class Backbone(nn.Module):
-    def __init__(self):
+    def __init__(self, model_name='resnet101'):
         super(Backbone, self).__init__()
         # embedding_dim = 2048
-        self.base_network = models.resnet101(pretrained=True)
+        self.model_name = model_name
+        if model_name == 'resnet101':
+            self.base_network = models.resnet101(pretrained=True)
+        elif model_name == 'resnet50':
+            self.base_network = models.resnet50(pretrained=True)
 
-        self.base_network.avgpool = nn.AvgPool2d(
-            kernel_size=7, stride=1, padding=0)  # replace avg pool
+        # replace avg pool
+        # self.base_network.avgpool = nn.AvgPool2d(
+        #     kernel_size=7, stride=1, padding=0)
         # self.base_network.avgpool = nn.AvgPool2d(2,stride=2) # replace avg pool
 
         print("---> the backbone is resnet101: ")
